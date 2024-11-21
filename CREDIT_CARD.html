@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Encryption & Decryption</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0-beta3/css/fontawesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            background: linear-gradient(135deg, rgba(95, 114, 190, 0.8) 0%, rgba(155, 35, 234, 0.8) 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container, .card-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: #fff;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+        /* Encrypt Styles */
+        .encrypt {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+        /* Decrypt Styles */
+        .decrypt {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+        }
+    </style>
+    <script>
+        // Encryption Key
+        const key = CryptoJS.enc.Utf8.parse('1234567890123456');  // Example key; use secure key management in production
+        const iv = CryptoJS.enc.Utf8.parse('1234567890123456');   // Example IV; generate securely in production
+
+        // Encrypt function using AES
+        function encrypt(text) {
+            const encrypted = CryptoJS.AES.encrypt(text, key, {
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            return encrypted.toString();
+        }
+
+        // Decrypt function using AES
+        function decrypt(encryptedText) {
+            const decrypted = CryptoJS.AES.decrypt(encryptedText, key, {
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            return decrypted.toString(CryptoJS.enc.Utf8);
+        }
+
+        function showSection(sectionId) {
+            document.getElementById('main-section').style.display = 'none';
+            document.getElementById('encrypt-section').style.display = 'none';
+            document.getElementById('decrypt-section').style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function handleEncrypt(event) {
+            event.preventDefault();
+            const cardNumber = document.getElementById('credit-card-number').value;
+            const expirationDate = document.getElementById('expiration-date').value;
+            const securityCode = document.getElementById('security-code').value;
+            const encryptedData = encrypt(cardNumber + '|' + expirationDate + '|' + securityCode);
+            document.getElementById('encrypted-result').innerText = "Encrypted Data: " + encryptedData;
+        }
+
+        function handleDecrypt(event) {
+            event.preventDefault();
+            const encryptedText = document.getElementById('encrypted-credit-card-number').value;
+            const decryptedData = decrypt(encryptedText);
+            document.getElementById('decrypted-result').innerText = "Decrypted Data: " + decryptedData;
+        }
+    </script>
+</head>
+<body>
+
+    <!-- Main Section -->
+    <div id="main-section" class="card-container">
+        <h1>Credit Card Encryption & Decryption</h1>
+        <p>Choose an option:</p>
+        <button class="btn btn-primary" onclick="showSection('encrypt-section')">Encrypt Credit Card Number</button>
+        <button class="btn btn-secondary" onclick="showSection('decrypt-section')">Decrypt Credit Card Number</button>
+    </div>
+
+    <!-- Encrypt Section -->
+    <div id="encrypt-section" class="container encrypt" style="display: none;">
+        <h1>Encrypt Credit Card Number</h1>
+        <form onsubmit="handleEncrypt(event);">
+            <label for="credit-card-number">Credit Card Number:</label>
+            <input type="text" id="credit-card-number" name="credit-card-number" required><br><br>
+            <label for="expiration-date">Expiration Date:</label>
+            <input type="text" id="expiration-date" name="expiration-date" required><br><br>
+            <label for="security-code">Security Code:</label>
+            <input type="text" id="security-code" name="security-code" required><br><br>
+            <input type="submit" value="Encrypt">
+        </form>
+        <p id="encrypted-result"></p>
+        <button class="btn btn-link text-white mt-3" onclick="showSection('main-section')">Back to Main</button>
+    </div>
+
+    <!-- Decrypt Section -->
+    <div id="decrypt-section" class="container decrypt" style="display: none;">
+        <h1>Decrypt Credit Card Number</h1>
+        <form onsubmit="handleDecrypt(event);">
+            <label for="encrypted-credit-card-number">Encrypted Credit Card Number:</label>
+            <input type="text" id="encrypted-credit-card-number" name="encrypted-credit-card-number" required><br><br>
+            <input type="submit" value="Decrypt">
+        </form>
+        <p id="decrypted-result"></p>
+        <button class="btn btn-link text-white mt-3" onclick="showSection('main-section')">Back to Main</button>
+    </div>
+
+</body>
+</html>
